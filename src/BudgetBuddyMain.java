@@ -3,9 +3,11 @@ package src;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -108,8 +110,8 @@ public class BudgetBuddyMain {
 
         // Save them to img directory
         try {
-            BitmapEncoder.saveBitmap(expenses, "img/April-Expenses", BitmapEncoder.BitmapFormat.PNG);
-            BitmapEncoder.saveBitmap(deposits, "img/April-Deposits", BitmapEncoder.BitmapFormat.PNG);
+            BitmapEncoder.saveBitmap(expenses, "output/April-Expenses", BitmapEncoder.BitmapFormat.PNG);
+            BitmapEncoder.saveBitmap(deposits, "output/April-Deposits", BitmapEncoder.BitmapFormat.PNG);
         } catch (IOException e) {
             System.out.println("IOException...");
             e.printStackTrace();
@@ -120,7 +122,7 @@ public class BudgetBuddyMain {
     // Open "Finances" workbook. Get expense/deposit data using Apache POI.
     // Create pie charts using XChart and display in a window.
     public static void main(String[] args) {
-        File f = new File("Finances.xlsx");
+        File f = new File("input/Finances.xlsx");
         try (XSSFWorkbook wb = new XSSFWorkbook(f)) {
             processWorkbook(wb);
         } catch (IOException | InvalidFormatException e) {
