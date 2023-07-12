@@ -14,6 +14,5 @@ These dependecies are not included in this repo.
 
 
 ## Extensions/TODOs
-- Process every sheet in the workbook
-- Allow user to select the workbook they want rather than hardcoding the name of the file
-- Implement a frontend in JavaFX
+- Allow user to select the workbook to process rather than hardcoding the name of the file
+- Implement a frontend in JavaFX that allows user to select a workbook, and displays the PieCharts in one window.
