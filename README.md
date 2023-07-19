@@ -11,6 +11,7 @@ charts will be created for each sheet/month: one for expenses and one for deposi
 - XChart 3.8.2 : used to create the pie charts (https://knowm.org/open-source/xchart/)
 - Apache POI 5.2.3 : used to read Excel spreadsheets (https://poi.apache.org/)
 - JavaFX 17.0.7 : used for frontend GUI (https://openjfx.io/)
+
 These dependecies are not included in this repo.
 
 
