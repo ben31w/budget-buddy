@@ -10,9 +10,14 @@ charts will be created for each sheet/month: one for expenses and one for deposi
 ## Current Dependencies
 - XChart 3.8.2 : used to create the pie charts (https://knowm.org/open-source/xchart/)
 - Apache POI 5.2.3 : used to read Excel spreadsheets (https://poi.apache.org/)
+- JavaFX 17.0.7 : used for frontend GUI (https://openjfx.io/)
 These dependecies are not included in this repo.
 
 
 ## Extensions/TODOs
-- Allow user to select the workbook to process rather than hardcoding the name of the file
-- Implement a frontend in JavaFX that allows user to select a workbook, and displays the PieCharts in one window.
+- Need better error handling if the Excel file isn't formatted properly.
+- Add a 'loading' image to display while the workbook is being processed.
+- Display the PieCharts inside BudgetBuddy.
+- Maybe allow the user to select an output path to save their images.
+- Clear output directory before saving the pie charts.
+- Use Gradle to manage dependencies instead of IntelliJ.
