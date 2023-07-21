@@ -1,9 +1,10 @@
 package src;
 
 import javafx.fxml.FXML;
-import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -22,7 +23,10 @@ import java.util.Map;
 
 public class BudgetBuddyController {
     @FXML
-    private Label label;
+    private ImageView imgView;
+
+    @FXML
+    private Label msgLabel;
 
     @FXML
     private TextField textField;
@@ -53,16 +57,28 @@ public class BudgetBuddyController {
             if (f.exists()) {
                 try (XSSFWorkbook wb = new XSSFWorkbook(f)) {
                     processWorkbook(wb);
-                    label.setText("Finished processing '" + f.getName() + "'. Check the 'output' directory.");
+                    msgLabel.setText("Finished processing '" + f.getName() + "'. Check the 'output' directory.");
                 } catch (IOException | InvalidFormatException e) {
-                    label.setText("This file could not be processed.");
+                    msgLabel.setText("This file could not be processed.");
                     e.printStackTrace();
                 }
             } else {
-                label.setText("This Excel file could not be found. Check the spelling perhaps.");
+                msgLabel.setText("This Excel file could not be found. Check the spelling perhaps.");
             }
         } else {
-            label.setText("Please select an Excel file.");
+            msgLabel.setText("Please select an Excel file.");
+        }
+
+        displayChartInGUI();
+    }
+
+
+    private void displayChartInGUI() {
+        // TODO is this the right directory to use all the time?
+        //  It works in IntelliJ but should it be up one directory?
+        Image image = new Image("output/2023-04-deposits.png");
+        if (!image.isError()) {
+            imgView.setImage(image);
         }
     }
 
