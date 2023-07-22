@@ -15,6 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.PieChart;
 import org.knowm.xchart.PieChartBuilder;
+import org.knowm.xchart.style.PieStyler;
 import org.knowm.xchart.style.Styler;
 
 import java.io.File;
@@ -223,6 +224,15 @@ public class BudgetBuddyController {
     private void createCharts(String date, Map<String, Double> expenses, Map<String, Double> deposits) {
         PieChart expensesPC = new PieChartBuilder().width(800).height(600).title(date + " expenses").theme(Styler.ChartTheme.GGPlot2).build();
         PieChart depositsPC = new PieChartBuilder().width(800).height(600).title(date + " deposits").theme(Styler.ChartTheme.GGPlot2).build();
+
+        // Styling the pie charts' legend and labels
+        PieStyler eps = expensesPC.getStyler();
+        eps.setLegendPosition(Styler.LegendPosition.InsideSW);
+        eps.setLabelType(PieStyler.LabelType.NameAndPercentage);
+
+        PieStyler dps = depositsPC.getStyler();
+        dps.setLegendPosition(Styler.LegendPosition.InsideSW);
+        dps.setLabelType(PieStyler.LabelType.NameAndPercentage);
 
         for (Map.Entry<String, Double> entry: expenses.entrySet()) {
             expensesPC.addSeries(entry.getKey(), entry.getValue());

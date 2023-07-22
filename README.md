@@ -16,9 +16,12 @@ These dependecies are not included in this repo.
 
 
 ## Extensions/TODOs
+- Bug: 'Create Charts' displays old charts from previous run instead of newly created charts.
 - Need to clear output directory before saving the pie charts, so the user can 
 run BudgetBuddy with different workbooks.
 - Give users the option to save to a custom directory.
+- Check if the program compiles from command line.
 - Need better error handling if the Excel file isn't formatted properly.
 - Pie charts should display the total amount spend/deposited in addition to percentages. 
 - Use Gradle to manage dependencies instead of IntelliJ.
+- Create a binary/executable
