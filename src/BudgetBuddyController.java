@@ -46,6 +46,11 @@ public class BudgetBuddyController {
 
 
     public BudgetBuddyController() {
+        initialize();
+    }
+
+
+    private void initialize() {
         charts = new ArrayList<>();
         currImage = -1;
     }
@@ -69,6 +74,7 @@ public class BudgetBuddyController {
     // When the user clicks 'Create Charts', attempt to process the file inside
     // BudgetBuddy's textfield. Only proceed if it's an Excel file that exists.
     public void processFile() {
+        initialize();
         resetImage();
         String filename = textField.getText();
 
@@ -89,6 +95,13 @@ public class BudgetBuddyController {
         } else {
             msgLabel.setText("Please select an Excel file.");
         }
+
+        // If charts were created, set the current image index (to the first chart).
+        if (!charts.isEmpty()) {
+            currImage = 0;
+            imgView.setImage(charts.get(currImage));
+            enableLeftRightButtons();
+        }
     }
 
 
@@ -100,6 +113,7 @@ public class BudgetBuddyController {
         }
 
         imgView.setImage( charts.get(--currImage) );
+        enableLeftRightButtons();
     }
 
 
@@ -111,12 +125,26 @@ public class BudgetBuddyController {
         }
 
         imgView.setImage( charts.get(++currImage) );
+        enableLeftRightButtons();
     }
 
 
+    // Reset image to placeholder & disable left/right buttons.
     private void resetImage() {
         currImage = -1;
         imgView.setImage(new Image("src/placeholder.png"));
+        leftButton.setDisable(true);
+        rightButton.setDisable(true);
+    }
+
+    private void enableLeftRightButtons() {
+        leftButton.setDisable(false);
+        rightButton.setDisable(false);
+        if (currImage == 0) {
+            leftButton.setDisable(true);
+        } else if (currImage == charts.size() - 1) {
+            rightButton.setDisable(true);
+        }
     }
 
 
@@ -129,12 +157,6 @@ public class BudgetBuddyController {
 
             XSSFSheet sheet = wb.getSheetAt(i);
             processSheet(sheet, expenseMap, depositMap);
-        }
-
-        // If charts were created, set the current image index (to the first chart).
-        if (!charts.isEmpty()) {
-            currImage = 0;
-            imgView.setImage(charts.get(currImage));
         }
     }
 

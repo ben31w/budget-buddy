@@ -41,9 +41,9 @@
       </HBox>
    </center>
    <left>
-      <Button fx:id="leftButton" mnemonicParsing="false" onAction="#handleLeftButton" prefHeight="40.0" prefWidth="20.0" text="&lt;" BorderPane.alignment="CENTER" />
+      <Button fx:id="leftButton" disable="true" mnemonicParsing="false" onAction="#handleLeftButton" prefHeight="40.0" prefWidth="20.0" text="&lt;" textAlignment="CENTER" BorderPane.alignment="CENTER" />
    </left>
    <right>
-      <Button fx:id="rightButton" mnemonicParsing="false" onAction="#handleRightButton" prefHeight="40.0" prefWidth="20.0" text="&gt;" BorderPane.alignment="CENTER" />
+      <Button fx:id="rightButton" disable="true" mnemonicParsing="false" onAction="#handleRightButton" prefHeight="40.0" prefWidth="20.0" text="&gt;" textAlignment="CENTER" BorderPane.alignment="CENTER" />
    </right>
 </BorderPane>
