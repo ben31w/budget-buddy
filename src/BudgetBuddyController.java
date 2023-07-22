@@ -98,6 +98,7 @@ public class BudgetBuddyController {
         }
 
         // If charts were created, set the current image index (to the first chart).
+        // TODO this isn't displaying the newly created images like it should.
         if (!charts.isEmpty()) {
             currImage = 0;
             imgView.setImage(charts.get(currImage));
@@ -229,10 +230,14 @@ public class BudgetBuddyController {
         PieStyler eps = expensesPC.getStyler();
         eps.setLegendPosition(Styler.LegendPosition.InsideSW);
         eps.setLabelType(PieStyler.LabelType.NameAndPercentage);
+        eps.setLabelsVisible(true);
+        eps.setLabelsDistance(.8);
 
         PieStyler dps = depositsPC.getStyler();
         dps.setLegendPosition(Styler.LegendPosition.InsideSW);
         dps.setLabelType(PieStyler.LabelType.NameAndPercentage);
+        dps.setLabelsVisible(true);
+        dps.setLabelsDistance(.8);
 
         for (Map.Entry<String, Double> entry: expenses.entrySet()) {
             expensesPC.addSeries(entry.getKey(), entry.getValue());
