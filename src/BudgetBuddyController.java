@@ -1,6 +1,7 @@
 package src;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -18,10 +19,22 @@ import org.knowm.xchart.style.Styler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BudgetBuddyController {
+
+    // the current image being displayed in BudgetBuddy
+    private int currImage;
+
+    // list of pie chart images generated
+    private List<Image> charts;
+
+    @FXML
+    private Button leftButton, rightButton;
+
     @FXML
     private ImageView imgView;
 
@@ -30,6 +43,12 @@ public class BudgetBuddyController {
 
     @FXML
     private TextField textField;
+
+
+    public BudgetBuddyController() {
+        charts = new ArrayList<>();
+        currImage = -1;
+    }
 
 
     // Open a file chooser so the user can select an Excel file as input.
@@ -50,6 +69,7 @@ public class BudgetBuddyController {
     // When the user clicks 'Create Charts', attempt to process the file inside
     // BudgetBuddy's textfield. Only proceed if it's an Excel file that exists.
     public void processFile() {
+        resetImage();
         String filename = textField.getText();
 
         if (filename.endsWith(".xlsx")) {
@@ -57,7 +77,8 @@ public class BudgetBuddyController {
             if (f.exists()) {
                 try (XSSFWorkbook wb = new XSSFWorkbook(f)) {
                     processWorkbook(wb);
-                    msgLabel.setText("Finished processing '" + f.getName() + "'. Check the 'output' directory.");
+                    String msg = "Displaying images for '" + f.getPath() + "'. Images saved to 'output' directory.";
+                    msgLabel.setText(msg);
                 } catch (IOException | InvalidFormatException e) {
                     msgLabel.setText("This file could not be processed.");
                     e.printStackTrace();
@@ -68,18 +89,34 @@ public class BudgetBuddyController {
         } else {
             msgLabel.setText("Please select an Excel file.");
         }
-
-        displayChartInGUI();
     }
 
 
-    private void displayChartInGUI() {
-        // TODO is this the right directory to use all the time?
-        //  It works in IntelliJ but should it be up one directory?
-        Image image = new Image("output/2023-04-deposits.png");
-        if (!image.isError()) {
-            imgView.setImage(image);
+    public void handleLeftButton() {
+        // if there are no images (-1) or this is the last image, the
+        // left button should do nothing. Eventually disable this button.
+        if (currImage == -1 || currImage == 0) {
+            return;
         }
+
+        imgView.setImage( charts.get(--currImage) );
+    }
+
+
+    public void handleRightButton() {
+        // if there are no images (-1) or this is the last image, the
+        // right button should do nothing. Eventually disable this button.
+        if (currImage == -1 || currImage == charts.size() - 1) {
+            return;
+        }
+
+        imgView.setImage( charts.get(++currImage) );
+    }
+
+
+    private void resetImage() {
+        currImage = -1;
+        imgView.setImage(new Image("src/placeholder.png"));
     }
 
 
@@ -92,6 +129,12 @@ public class BudgetBuddyController {
 
             XSSFSheet sheet = wb.getSheetAt(i);
             processSheet(sheet, expenseMap, depositMap);
+        }
+
+        // If charts were created, set the current image index (to the first chart).
+        if (!charts.isEmpty()) {
+            currImage = 0;
+            imgView.setImage(charts.get(currImage));
         }
     }
 
@@ -166,14 +209,20 @@ public class BudgetBuddyController {
             depositsPC.addSeries(entry.getKey(), entry.getValue());
         }
 
-        // Save them to output directory
+        // Save them to output directory & add them to the charts list
         try {
             String expensePath = String.format("output/%s-expenses", date);
             String depositPath = String.format("output/%s-deposits", date);
             BitmapEncoder.saveBitmap(expensesPC, expensePath, BitmapEncoder.BitmapFormat.PNG);
             BitmapEncoder.saveBitmap(depositsPC, depositPath, BitmapEncoder.BitmapFormat.PNG);
-        } catch (IOException e) {
+
+            Image expensesImg = new Image(expensePath + ".png");
+            Image depositsImg = new Image(depositPath + ".png");
+            charts.add(expensesImg);
+            charts.add(depositsImg);
+        } catch (IOException  | IllegalArgumentException e) {
             // unlikely this exception will occur, but might want to add some better error handling.
+            // IllegalArgumentException: Image couldn't be created from string. Maybe have better handling for this.
             e.printStackTrace();
         }
     }
