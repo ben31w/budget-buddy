@@ -16,9 +16,9 @@ These dependecies are not included in this repo.
 
 
 ## Extensions/TODOs
+- Need to clear output directory before saving the pie charts, so the user can 
+run BudgetBuddy with different workbooks.
+- Give users the option to save to a custom directory.
 - Need better error handling if the Excel file isn't formatted properly.
-- Display all the pie charts inside BudgetBuddy (somehow).
 - Pie charts should display the total amount spend/deposited in addition to percentages. 
-- Maybe allow the user to select an output path to save their images.
-- Clear output directory before saving the pie charts.
 - Use Gradle to manage dependencies instead of IntelliJ.
