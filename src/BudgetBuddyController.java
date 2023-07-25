@@ -3,11 +3,13 @@ package src;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import org.apache.commons.io.FileUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -27,34 +29,11 @@ import java.util.Map;
 
 public class BudgetBuddyController {
 
-    // the current image being displayed in BudgetBuddy
-    private int currImage;
-
-    // list of pie chart images generated
-    private List<Image> charts;
+    @FXML
+    private TextField excelTF, outputTF;
 
     @FXML
-    private Button leftButton, rightButton;
-
-    @FXML
-    private ImageView imgView;
-
-    @FXML
-    private Label msgLabel;
-
-    @FXML
-    private TextField textField;
-
-
-    public BudgetBuddyController() {
-        initialize();
-    }
-
-
-    private void initialize() {
-        charts = new ArrayList<>();
-        currImage = -1;
-    }
+    private TextArea msgLog;
 
 
     // Open a file chooser so the user can select an Excel file as input.
@@ -67,85 +46,43 @@ public class BudgetBuddyController {
                 new ExtensionFilter("Excel Files", "*.xlsx"));
         File selected = fc.showOpenDialog(null);
         if (selected != null) {
-            textField.setText(selected.getPath());
+            excelTF.setText(selected.getPath());
         }
     }
 
 
     // When the user clicks 'Create Charts', attempt to process the file inside
-    // BudgetBuddy's textfield. Only proceed if it's an Excel file that exists.
+    // the Excel textfield. Only proceed if it's an Excel file that exists.
     public void processFile() {
-        initialize();
-        resetImage();
-        String filename = textField.getText();
+        clearDefaultOutputDir();
+        String filename = excelTF.getText();
 
         if (filename.endsWith(".xlsx")) {
             File f = new File(filename);
             if (f.exists()) {
                 try (XSSFWorkbook wb = new XSSFWorkbook(f)) {
                     processWorkbook(wb);
-                    String msg = "Displaying images for '" + f.getPath() + "'. Images saved to 'output' directory.";
-                    msgLabel.setText(msg);
+                    String msg = "Created images for '" + f.getPath() + "'. Images saved to 'output' directory.\n";
+                    msgLog.appendText(msg);
                 } catch (IOException | InvalidFormatException e) {
-                    msgLabel.setText("This file could not be processed.");
+                    msgLog.appendText("This file could not be processed: " + f.getPath() + "\n");
                     e.printStackTrace();
                 }
             } else {
-                msgLabel.setText("This Excel file could not be found. Check the spelling perhaps.");
+                msgLog.appendText("This Excel file could not be found. Check the spelling perhaps: " + f.getPath() + "\n");
             }
         } else {
-            msgLabel.setText("Please select an Excel file.");
-        }
-
-        // If charts were created, set the current image index (to the first chart).
-        // TODO this isn't displaying the newly created images like it should.
-        if (!charts.isEmpty()) {
-            currImage = 0;
-            imgView.setImage(charts.get(currImage));
-            enableLeftRightButtons();
+            msgLog.appendText("Please select an Excel file.\n");
         }
     }
 
+    private void clearDefaultOutputDir() {
+        try {
+            FileUtils.deleteDirectory(new File("output"));
+        } catch (IOException e) {
 
-    public void handleLeftButton() {
-        // if there are no images (-1) or this is the last image, the
-        // left button should do nothing. Eventually disable this button.
-        if (currImage == -1 || currImage == 0) {
-            return;
-        }
-
-        imgView.setImage( charts.get(--currImage) );
-        enableLeftRightButtons();
-    }
-
-
-    public void handleRightButton() {
-        // if there are no images (-1) or this is the last image, the
-        // right button should do nothing. Eventually disable this button.
-        if (currImage == -1 || currImage == charts.size() - 1) {
-            return;
-        }
-
-        imgView.setImage( charts.get(++currImage) );
-        enableLeftRightButtons();
-    }
-
-
-    // Reset image to placeholder & disable left/right buttons.
-    private void resetImage() {
-        currImage = -1;
-        imgView.setImage(new Image("src/placeholder.png"));
-        leftButton.setDisable(true);
-        rightButton.setDisable(true);
-    }
-
-    private void enableLeftRightButtons() {
-        leftButton.setDisable(false);
-        rightButton.setDisable(false);
-        if (currImage == 0) {
-            leftButton.setDisable(true);
-        } else if (currImage == charts.size() - 1) {
-            rightButton.setDisable(true);
+        } finally {
+            new File("output").mkdirs();
         }
     }
 
@@ -208,7 +145,6 @@ public class BudgetBuddyController {
         createCharts(month.getSheetName(), expenses, deposits);
     }
 
-
     // Update the value in the given map. If this category is already in the map,
     // add to its existing total. Otherwise, intialize the category.
     private void updateMap(Map<String, Double> map, String cat, double value) {
@@ -252,11 +188,6 @@ public class BudgetBuddyController {
             String depositPath = String.format("output/%s-deposits", date);
             BitmapEncoder.saveBitmap(expensesPC, expensePath, BitmapEncoder.BitmapFormat.PNG);
             BitmapEncoder.saveBitmap(depositsPC, depositPath, BitmapEncoder.BitmapFormat.PNG);
-
-            Image expensesImg = new Image(expensePath + ".png");
-            Image depositsImg = new Image(depositPath + ".png");
-            charts.add(expensesImg);
-            charts.add(depositsImg);
         } catch (IOException  | IllegalArgumentException e) {
             // unlikely this exception will occur, but might want to add some better error handling.
             // IllegalArgumentException: Image couldn't be created from string. Maybe have better handling for this.

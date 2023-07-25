@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.apache.commons.io.FileUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -28,7 +29,7 @@ public class BudgetBuddyMain extends Application {
         loader.setLocation(getClass().getResource("BudgetBuddy.fxml"));
         Parent root = loader.load();
         stage.setScene(new Scene(root));
-
+        stage.setTitle("Budget Buddy");
         stage.show();
     }
 
