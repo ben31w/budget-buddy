@@ -7,6 +7,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import org.apache.commons.io.FileUtils;
@@ -22,6 +23,9 @@ import org.knowm.xchart.style.Styler;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,11 +39,15 @@ public class BudgetBuddyController {
     @FXML
     private TextArea msgLog;
 
+    // stores the user's custom output directory to save their images.
+    // (set to empty string if the directory is not valid)
+    private String customOutputDir;
+
 
     // Open a file chooser so the user can select an Excel file as input.
     // The filename is put inside a textfield which is later read from
     // when creating charts.
-    public void openFileChooser() {
+    public void openExcelFileChooser() {
         FileChooser fc = new FileChooser();
         fc.setTitle("Open Excel File");
         fc.getExtensionFilters().addAll(
@@ -51,10 +59,24 @@ public class BudgetBuddyController {
     }
 
 
+    // Open a file chooser so the user can select a directory to save
+    // the pie chart images to.
+    public void openOutputDirectoryChooser() {
+        DirectoryChooser dc = new DirectoryChooser();
+        dc.setTitle("Select a directory");
+        dc.setInitialDirectory(new File(System.getProperty("user.dir")));
+        File selected = dc.showDialog(null);
+        if (selected != null) {
+            outputTF.setText(selected.getPath());
+        }
+    }
+
+
     // When the user clicks 'Create Charts', attempt to process the file inside
     // the Excel textfield. Only proceed if it's an Excel file that exists.
     public void processFile() {
         clearDefaultOutputDir();
+        setCustomOutputDir();
         String filename = excelTF.getText();
 
         if (filename.endsWith(".xlsx")) {
@@ -62,14 +84,21 @@ public class BudgetBuddyController {
             if (f.exists()) {
                 try (XSSFWorkbook wb = new XSSFWorkbook(f)) {
                     processWorkbook(wb);
-                    String msg = "Created images for '" + f.getPath() + "'. Images saved to 'output' directory.\n";
+                    String msg = "Created images for '" + f.getPath() + "'.\n";
+
+                    // notify user if images are saved to their custom directory.
+                    if (!customOutputDir.isEmpty()) {
+                        msg += "Images saved to  '" + customOutputDir + "'\n";
+                    } else if (!outputTF.getText().isEmpty()) {
+                        msg += "Failed to save to '" + outputTF.getText() + "'. Directory not found; check the spelling.\n";
+                    }
                     msgLog.appendText(msg);
                 } catch (IOException | InvalidFormatException e) {
                     msgLog.appendText("This file could not be processed: " + f.getPath() + "\n");
                     e.printStackTrace();
                 }
             } else {
-                msgLog.appendText("This Excel file could not be found. Check the spelling perhaps: " + f.getPath() + "\n");
+                msgLog.appendText("This Excel file could not be found. Check the spelling perhaps: '" + f.getPath() + "'\n");
             }
         } else {
             msgLog.appendText("Please select an Excel file.\n");
@@ -83,6 +112,19 @@ public class BudgetBuddyController {
 
         } finally {
             new File("output").mkdirs();
+        }
+    }
+
+    // Check the output directory textfield and set the field it's a valid directory.
+    private void setCustomOutputDir() {
+        customOutputDir = "";
+
+        String dir = outputTF.getText();
+        if (!dir.isEmpty()) {
+            Path p = Paths.get(dir);
+            if (Files.exists(p)) {
+                customOutputDir = dir;
+            }
         }
     }
 
@@ -182,12 +224,20 @@ public class BudgetBuddyController {
             depositsPC.addSeries(entry.getKey(), entry.getValue());
         }
 
-        // Save them to output directory & add them to the charts list
+        // Save them to output directory & the user's custom directory if provided.
         try {
             String expensePath = String.format("output/%s-expenses", date);
             String depositPath = String.format("output/%s-deposits", date);
             BitmapEncoder.saveBitmap(expensesPC, expensePath, BitmapEncoder.BitmapFormat.PNG);
             BitmapEncoder.saveBitmap(depositsPC, depositPath, BitmapEncoder.BitmapFormat.PNG);
+
+            // user entered a custom directory
+            if (!customOutputDir.isEmpty()) {
+                String customExpensePath =  String.format(customOutputDir + "/%s-expenses", date);
+                String customDepositPath = String.format(customOutputDir + "/%s-deposits", date);
+                BitmapEncoder.saveBitmap(expensesPC, customExpensePath, BitmapEncoder.BitmapFormat.PNG);
+                BitmapEncoder.saveBitmap(depositsPC, customDepositPath, BitmapEncoder.BitmapFormat.PNG);
+            }
         } catch (IOException  | IllegalArgumentException e) {
             // unlikely this exception will occur, but might want to add some better error handling.
             // IllegalArgumentException: Image couldn't be created from string. Maybe have better handling for this.

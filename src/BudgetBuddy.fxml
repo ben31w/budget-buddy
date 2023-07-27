@@ -15,14 +15,14 @@
          <HBox prefHeight="30.0" prefWidth="200.0" spacing="10.0">
             <children>
                <TextField fx:id="excelTF" prefWidth="550.0" promptText="Select an Excel file" />
-               <Button mnemonicParsing="false" onAction="#openFileChooser" text="Browse" />
+               <Button mnemonicParsing="false" onAction="#openExcelFileChooser" text="Browse" />
             </children>
          </HBox>
          <Label alignment="TOP_CENTER" text="Select an output directory to save your images (optional):" />
          <HBox prefHeight="30.0" spacing="10.0">
             <children>
                <TextField fx:id="outputTF" prefWidth="550.0" promptText="Select a directory" />
-               <Button mnemonicParsing="false" onAction="#openFileChooser" text="Browse" />
+               <Button mnemonicParsing="false" onAction="#openOutputDirectoryChooser" text="Browse" />
             </children>
          </HBox>
          <HBox prefHeight="30.0" spacing="10.0">
