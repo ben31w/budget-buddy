@@ -88,17 +88,17 @@ public class BudgetBuddyController {
 
                     // notify user if images are saved to their custom directory.
                     if (!customOutputDir.isEmpty()) {
-                        msg += "Images saved to  '" + customOutputDir + "'\n";
+                        msg += "Images saved to  '" + customOutputDir + "'.\n";
                     } else if (!outputTF.getText().isEmpty()) {
                         msg += "Failed to save to '" + outputTF.getText() + "'. Directory not found; check the spelling.\n";
                     }
                     msgLog.appendText(msg);
                 } catch (IOException | InvalidFormatException e) {
-                    msgLog.appendText("This file could not be processed: " + f.getPath() + "\n");
+                    msgLog.appendText("This file could not be processed: '" + f.getPath() + "'.\n");
                     e.printStackTrace();
                 }
             } else {
-                msgLog.appendText("This Excel file could not be found. Check the spelling perhaps: '" + f.getPath() + "'\n");
+                msgLog.appendText("This Excel file could not be found. Check the spelling perhaps: '" + f.getPath() + "'.\n");
             }
         } else {
             msgLog.appendText("Please select an Excel file.\n");
