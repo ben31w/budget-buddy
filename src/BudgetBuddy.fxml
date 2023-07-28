@@ -28,7 +28,7 @@
          <HBox prefHeight="30.0" spacing="10.0">
             <children>
                <Button mnemonicParsing="false" onAction="#processFile" text="Create Charts" />
-               <Button mnemonicParsing="false" text="Display Charts" />
+               <Button mnemonicParsing="false" onAction="#displayCharts" text="Display Charts" />
             </children>
          </HBox>
          <Label text="Log" BorderPane.alignment="CENTER" />

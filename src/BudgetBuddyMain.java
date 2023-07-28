@@ -30,6 +30,8 @@ public class BudgetBuddyMain extends Application {
         Parent root = loader.load();
         stage.setScene(new Scene(root));
         stage.setTitle("Budget Buddy");
+        // Keep this stage near the top of the screen, so it can open another stage below
+        stage.setY(100);
         stage.show();
     }
 

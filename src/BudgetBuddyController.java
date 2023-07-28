@@ -1,6 +1,9 @@
 package src;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -10,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -69,6 +73,33 @@ public class BudgetBuddyController {
         if (selected != null) {
             outputTF.setText(selected.getPath());
         }
+    }
+
+
+    public void displayCharts() {
+        // get list of charts to display from 'output' directory
+        List<Image> charts = new ArrayList<>();
+        File output = new File("output");
+        File[] directoryListing = output.listFiles();
+        for (File chartPng : directoryListing) {
+            Image chart = new Image(String.valueOf(chartPng));
+            charts.add(chart);
+        }
+
+        // dislay charts in new JavaFX Stage
+        Stage chartsStage = new Stage();
+        FXMLLoader loader = new FXMLLoader();
+        try {
+            loader.setLocation(getClass().getResource("ChartViewer.fxml"));
+            Parent root = loader.load();
+            chartsStage.setScene(new Scene(root));
+            chartsStage.setTitle("Chart Viewer");
+            chartsStage.setY(450);
+            chartsStage.show();
+        } catch (IOException e) {
+                        msgLog.appendText("An exception appeard. Failed to display charts.");
+        }
+
     }
 
 
