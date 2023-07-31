@@ -2,6 +2,7 @@ package src;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -15,6 +16,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.comparator.NameFileComparator;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -27,15 +29,18 @@ import org.knowm.xchart.style.Styler;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
-public class BudgetBuddyController {
+public class BudgetBuddyController implements Initializable {
 
     @FXML
     private TextField excelTF, outputTF;
@@ -46,6 +51,12 @@ public class BudgetBuddyController {
     // stores the user's custom output directory to save their images.
     // (set to empty string if the directory is not valid)
     private String customOutputDir;
+
+
+    // Clear 'output' directory when BudgetBuddy initializes.
+    public void initialize(URL url, ResourceBundle rb) {
+        clearDefaultOutputDir();
+    }
 
 
     // Open a file chooser so the user can select an Excel file as input.
@@ -76,11 +87,15 @@ public class BudgetBuddyController {
     }
 
 
+    // When the user clicks 'Display Charts', get the list of charts stored
+    // in the default 'output' directory, and open a new Stage.
     public void displayCharts() {
         // get list of charts to display from 'output' directory
         List<Image> charts = new ArrayList<>();
         File output = new File("output");
         File[] directoryListing = output.listFiles();
+        Arrays.sort(directoryListing, NameFileComparator.NAME_COMPARATOR);
+
         for (File chartPng : directoryListing) {
             Image chart = new Image(String.valueOf(chartPng));
             charts.add(chart);
@@ -89,8 +104,10 @@ public class BudgetBuddyController {
         // dislay charts in new JavaFX Stage
         Stage chartsStage = new Stage();
         FXMLLoader loader = new FXMLLoader();
+        ChartViewerController c = new ChartViewerController(charts);
         try {
             loader.setLocation(getClass().getResource("ChartViewer.fxml"));
+            loader.setController(c);
             Parent root = loader.load();
             chartsStage.setScene(new Scene(root));
             chartsStage.setTitle("Chart Viewer");

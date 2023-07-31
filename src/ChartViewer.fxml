@@ -5,20 +5,19 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 
-
 <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="25.0" text="&lt;" textAlignment="CENTER" />
-      <ImageView fitHeight="600.0" fitWidth="800.0" pickOnBounds="true" preserveRatio="true">
+      <Button fx:id="leftButton" mnemonicParsing="false" onAction="#handleLeftButton" prefHeight="50.0" prefWidth="25.0" text="&lt;" textAlignment="CENTER" />
+      <ImageView fx:id="leftImg" fitHeight="600.0" fitWidth="800.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@placeholder.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="600.0" fitWidth="800.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="rightImg" fitHeight="600.0" fitWidth="800.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@placeholder.png" />
          </image>
       </ImageView>
-      <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="25.0" text="&gt;" />
+      <Button fx:id="rightButton" mnemonicParsing="false" onAction="#handleRightButton" prefHeight="50.0" prefWidth="25.0" text="&gt;" />
    </children>
 </HBox>
