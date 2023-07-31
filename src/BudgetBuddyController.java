@@ -87,21 +87,48 @@ public class BudgetBuddyController implements Initializable {
     }
 
 
-    // When the user clicks 'Display Charts', get the list of charts stored
-    // in the default 'output' directory, and open a new Stage.
-    public void displayCharts() {
-        // get list of charts to display from 'output' directory
-        List<Image> charts = new ArrayList<>();
-        File output = new File("output");
-        File[] directoryListing = output.listFiles();
-        Arrays.sort(directoryListing, NameFileComparator.NAME_COMPARATOR);
+    // When the user clicks 'Create Charts', attempt to process the file inside
+    // the Excel textfield. Only proceed if it's an Excel file that exists.
+    public void processFile() {
+        clearDefaultOutputDir();
+        setCustomOutputDir();
+        String msg; // message to display to the user.
 
-        for (File chartPng : directoryListing) {
-            Image chart = new Image(String.valueOf(chartPng));
-            charts.add(chart);
+        String filename = excelTF.getText();
+        if (filename.endsWith(".xlsx")) {
+            File f = new File(filename);
+            if (f.exists()) {
+                try (XSSFWorkbook wb = new XSSFWorkbook(f)) {
+                    processWorkbook(wb);
+                    msg = "Created images for '" + f.getPath() + "'.\n";
+
+                    // If customOutputDir is set, then we have a valid directory to save to.
+                    // If it's not set but the textfield contains something, then the user entered an invalid directory.
+                    if (!customOutputDir.isEmpty()) {
+                        msg += "Images saved to  '" + customOutputDir + "'.\n";
+                    } else if (!outputTF.getText().isEmpty()) {
+                        msg += "Failed to save to '" + outputTF.getText() + "'. Directory not found; check the spelling.\n";
+                    }
+                } catch (IOException | InvalidFormatException e) {
+                    msg = "This file could not be processed: '" + f.getPath() + "'.\n";
+                    e.printStackTrace();
+                }
+            } else {
+                msg = "This Excel file could not be found. Check the spelling perhaps: '" + f.getPath() + "'.\n";
+            }
+        } else {
+            msg = "Please select an Excel file.\n";
         }
 
-        // dislay charts in new JavaFX Stage
+        msgLog.appendText(msg);
+    }
+
+
+    // When the user clicks 'Display Charts', get the list of charts stored
+    // in the default 'output' directory, and display them in a new window.
+    public void displayCharts() {
+        List<Image> charts = getChartsFromDefaultOutputDir();
+
         Stage chartsStage = new Stage();
         FXMLLoader loader = new FXMLLoader();
         ChartViewerController c = new ChartViewerController(charts);
@@ -114,45 +141,12 @@ public class BudgetBuddyController implements Initializable {
             chartsStage.setY(450);
             chartsStage.show();
         } catch (IOException e) {
-                        msgLog.appendText("An exception appeard. Failed to display charts.");
-        }
-
-    }
-
-
-    // When the user clicks 'Create Charts', attempt to process the file inside
-    // the Excel textfield. Only proceed if it's an Excel file that exists.
-    public void processFile() {
-        clearDefaultOutputDir();
-        setCustomOutputDir();
-        String filename = excelTF.getText();
-
-        if (filename.endsWith(".xlsx")) {
-            File f = new File(filename);
-            if (f.exists()) {
-                try (XSSFWorkbook wb = new XSSFWorkbook(f)) {
-                    processWorkbook(wb);
-                    String msg = "Created images for '" + f.getPath() + "'.\n";
-
-                    // notify user if images are saved to their custom directory.
-                    if (!customOutputDir.isEmpty()) {
-                        msg += "Images saved to  '" + customOutputDir + "'.\n";
-                    } else if (!outputTF.getText().isEmpty()) {
-                        msg += "Failed to save to '" + outputTF.getText() + "'. Directory not found; check the spelling.\n";
-                    }
-                    msgLog.appendText(msg);
-                } catch (IOException | InvalidFormatException e) {
-                    msgLog.appendText("This file could not be processed: '" + f.getPath() + "'.\n");
-                    e.printStackTrace();
-                }
-            } else {
-                msgLog.appendText("This Excel file could not be found. Check the spelling perhaps: '" + f.getPath() + "'.\n");
-            }
-        } else {
-            msgLog.appendText("Please select an Excel file.\n");
+            msgLog.appendText("An exception appeard. Failed to display charts.");
         }
     }
 
+
+    // Clear the contents of the 'output' directory.
     private void clearDefaultOutputDir() {
         try {
             FileUtils.deleteDirectory(new File("output"));
@@ -163,7 +157,7 @@ public class BudgetBuddyController implements Initializable {
         }
     }
 
-    // Check the output directory textfield and set the field it's a valid directory.
+    // Check the custom output directory textfield and set the field it's a valid directory.
     private void setCustomOutputDir() {
         customOutputDir = "";
 
@@ -174,6 +168,21 @@ public class BudgetBuddyController implements Initializable {
                 customOutputDir = dir;
             }
         }
+    }
+
+
+    // Check 'output' directory for pie chart images.
+    // Return charts as an ArrayList<Image>.
+    private List<Image> getChartsFromDefaultOutputDir() {
+        List<Image> charts = new ArrayList<>();
+
+        File[] images = new File("output").listFiles();
+        Arrays.sort(images, NameFileComparator.NAME_COMPARATOR);
+        for (File chartPng : images) {
+            charts.add(   new Image(String.valueOf(chartPng)) );
+        }
+
+        return charts;
     }
 
 

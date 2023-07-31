@@ -16,7 +16,8 @@ These dependecies are not included in this repo.
 
 
 ## Extensions/TODOs
-- Give users the option to save to a custom directory.
+- Disable 'Display Charts' if the user has not created any charts.
+- Disable 'Create Charts' button while the file is proccessing.
 - Check if the program compiles from command line (maybe write a script).
 - Need better error handling if the Excel file isn't formatted properly.
 - Pie charts should display the total amount spend/deposited in addition to percentages. 
